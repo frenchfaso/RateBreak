@@ -12,6 +12,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            margin: 0;
         }
 
         main {
@@ -19,9 +20,10 @@
         }
 
         footer {
-            text-align: center;
-            padding: 1rem;
-            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* background-color: #f1f1f1; */
         }
 
         hgroup {
@@ -31,16 +33,12 @@
 </head>
 
 <body>
-
-    <hgroup>
-        <h1>RateBreak</h1>
-        <p x-data="{ date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) }"
-            x-text="date"></p>
-    </hgroup>
-
-
-    <!-- Main Content -->
-    <main x-data="rateBreak()">
+    <main class="container" x-data="rateBreak()">
+        <hgroup>
+            <h1>RateBreak</h1>
+            <p x-data="{ date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) }"
+                x-text="date"></p>
+        </hgroup>
         <!-- Card for Prices -->
         <article class="card">
             <section>
@@ -58,28 +56,31 @@
             <section>
                 <!-- Input Fields -->
                 <form>
-                    <fieldset role="group">
-                        <div class="grid">
-                            <label for="taxRate1">Tax Rate 2024 (%)</label>
+                    <fieldset>
+                        <!-- <legend>Tax Rates</legend> -->
+                        <div>
+                            <label for="taxRate1">2024 Rate (%)</label>
                             <input type="number" id="taxRate1" x-model.number="taxRate1" />
                         </div>
-                        <div class="grid">
-                            <label for="taxRate2">Tax Rate 2025 (%)</label>
+                        <div>
+                            <label for="taxRate2">2025 Rate (%)</label>
                             <input type="number" id="taxRate2" x-model.number="taxRate2" />
                         </div>
                     </fieldset>
-                    <div class="grid">
-                        <label for="currency">Currency</label>
-                        <select id="currency" x-model="currency" @change="fetchBitcoinPrice">
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                        </select>
-                    </div>
+                    <fieldset>
+                        <!-- <legend>FIAT Currency</legend> -->
+                        <div>
+                            <label for="currency">FIAT Currency</label>
+                            <select id="currency" x-model="currency" @change="fetchBitcoinPrice">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
+                    </fieldset>
                 </form>
             </section>
         </article>
     </main>
-
     <footer>
         <p>Made with ❤️ by Frenchfaso</p>
     </footer>
