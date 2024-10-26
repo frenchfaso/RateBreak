@@ -1,47 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RateBreak</title>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.2.2/dist/cdn.min.js" defer></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="flex flex-col min-h-screen">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    <!-- Header -->
-    <header class="bg-gray-800 text-white text-center py-2">
-        <div x-data="{ date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) }">
-            <span x-text="date"></span>
-        </div>
-    </header>
+        main {
+            flex: 1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        hgroup {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <hgroup>
+        <h1>RateBreak</h1>
+        <p x-data="{ date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) }"
+            x-text="date"></p>
+    </hgroup>
+
 
     <!-- Main Content -->
-    <main class="flex-grow flex flex-col justify-between p-4" x-data="rateBreak()">
-        <!-- Bitcoin Price -->
-        <div class="text-center text-2xl mb-4">
-            <div class="text-blue-500">Current Bitcoin Price: $<span x-text="Math.floor(bitcoinPrice)"></span></div>
-        </div>
-        <!-- Break Even Price -->
-        <div class="text-center text-2xl mb-4">
-            <div class="text-pink-500">Break Even Price: $<span x-text="Math.floor(breakEvenPrice)"></span></div>
-        </div>
-        <!-- Input Fields -->
-        <div class="flex flex-col space-y-4">
-            <div>
-                <label for="taxRate1" class="block text-sm font-medium">Tax Rate 2024 (%)</label>
-                <input type="number" id="taxRate1" x-model.number="taxRate1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-            </div>
-            <div>
-                <label for="taxRate2" class="block text-sm font-medium">Tax Rate 2025 (%)</label>
-                <input type="number" id="taxRate2" x-model.number="taxRate2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-            </div>
-        </div>
+    <main x-data="rateBreak()">
+        <!-- Card for Prices -->
+        <article class="card">
+            <section>
+                <!-- Bitcoin Price -->
+                <p>Current Bitcoin Price: <span x-text="currencySymbol"></span><span
+                        x-text="Math.floor(bitcoinPrice)"></span></p>
+                <!-- Break Even Price -->
+                <p>Break Even Price: <span x-text="currencySymbol"></span><span
+                        x-text="Math.floor(breakEvenPrice)"></span></p>
+            </section>
+        </article>
+
+        <!-- Card for Form -->
+        <article class="card">
+            <section>
+                <!-- Input Fields -->
+                <form>
+                    <fieldset role="group">
+                        <div class="grid">
+                            <label for="taxRate1">Tax Rate 2024 (%)</label>
+                            <input type="number" id="taxRate1" x-model.number="taxRate1" />
+                        </div>
+                        <div class="grid">
+                            <label for="taxRate2">Tax Rate 2025 (%)</label>
+                            <input type="number" id="taxRate2" x-model.number="taxRate2" />
+                        </div>
+                    </fieldset>
+                    <div class="grid">
+                        <label for="currency">Currency</label>
+                        <select id="currency" x-model="currency" @change="fetchBitcoinPrice">
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                </form>
+            </section>
+        </article>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white text-center py-2">
-        Made with ❤️ by Frenchfaso
+    <footer>
+        <p>Made with ❤️ by Frenchfaso</p>
     </footer>
 
     <script>
@@ -50,14 +90,18 @@
                 bitcoinPrice: 0,
                 taxRate1: 26,
                 taxRate2: 42,
+                currency: 'USD',
+                get currencySymbol() {
+                    return this.currency === 'USD' ? '$' : '€';
+                },
                 get breakEvenPrice() {
                     return (this.bitcoinPrice * (1 - this.taxRate1 / 100)) / (1 - this.taxRate2 / 100);
                 },
                 async fetchBitcoinPrice() {
                     try {
-                        const response = await fetch('https://api.coindesk.com/v1/bpi/currentprice/USD.json');
+                        const response = await fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.currency}.json`);
                         const data = await response.json();
-                        this.bitcoinPrice = data.bpi.USD.rate_float;
+                        this.bitcoinPrice = data.bpi[this.currency].rate_float;
                     } catch (error) {
                         console.error('Error fetching Bitcoin price:', error);
                     }
@@ -72,4 +116,5 @@
         }
     </script>
 </body>
+
 </html>
