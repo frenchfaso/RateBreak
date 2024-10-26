@@ -176,9 +176,11 @@
 
                 // Methods
                 async fetchFiatCurrencies() {
+                    console.log('Fetching fiat currencies...');
                     try {
                         const response = await fetch('https://api.coindesk.com/v1/bpi/supported-currencies.json');
                         const data = await response.json();
+                        console.log('Fiat currencies fetched:', data);
                         const previousCurrency = this.currency; // Retain the user's selected currency
                         this.fiatCurrencies = Object.fromEntries(data.map(item => [item.currency, item.country || item.currency]));
                         if (!this.fiatCurrencies.hasOwnProperty('EUR')) {
@@ -193,21 +195,26 @@
                             document.getElementById('currency').value = this.currency; // Update dropdown
                         });
                     } catch (error) {
+                        console.error('Error fetching fiat currencies:', error);
                         this.showError('Could not fetch fiat currencies. Please check your connection.');
                     }
                 },
                 async fetchBitcoinPrice() {
                     if (!this.realtimePrice) return;
+                    console.log('Fetching Bitcoin price for currency:', this.currency);
                     try {
                         const response = await fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.currency}.json`);
                         if (!response.ok) throw new Error('Failed to fetch price');
                         const data = await response.json();
+                        console.log('Bitcoin price fetched:', data);
                         this.bitcoinPrice = data.bpi[this.currency].rate_float || this.customPrice;
                     } catch (error) {
+                        console.error('Error fetching Bitcoin price:', error);
                         this.showError('Could not fetch Bitcoin price. Please check your connection.');
                     }
                 },
                 saveState() {
+                    console.log('Saving state...');
                     localStorage.setItem('rateBreakState', JSON.stringify({
                         currency: this.currency,
                         customPrice: this.customPrice,
@@ -215,8 +222,16 @@
                         taxRate1: this.taxRate1,
                         taxRate2: this.taxRate2,
                     }));
+                    console.log('State saved:', {
+                        currency: this.currency,
+                        customPrice: this.customPrice,
+                        realtimePrice: this.realtimePrice,
+                        taxRate1: this.taxRate1,
+                        taxRate2: this.taxRate2,
+                    });
                 },
                 loadState() {
+                    console.log('Loading state...');
                     const savedState = JSON.parse(localStorage.getItem('rateBreakState'));
                     if (savedState) {
                         this.currency = savedState.currency || 'EUR';
@@ -224,9 +239,13 @@
                         this.realtimePrice = savedState.realtimePrice ?? true;
                         this.taxRate1 = savedState.taxRate1 || 26;
                         this.taxRate2 = savedState.taxRate2 || 42;
+                        console.log('State loaded:', savedState);
+                    } else {
+                        console.log('No saved state found.');
                     }
                 },
                 initialize() {
+                    console.log('Initializing app...');
                     this.loadState();
                     this.fetchFiatCurrencies();
                     if (!this.realtimePrice) {
@@ -239,6 +258,7 @@
                     }, 60000);
 
                     this.$watch('realtimePrice', value => {
+                        console.log('Realtime price changed:', value);
                         clearInterval(this.intervalId);
                         if (value) {
                             this.fetchBitcoinPrice();
@@ -250,22 +270,33 @@
                     });
 
                     this.$watch('currency', () => {
+                        console.log('Currency changed:', this.currency);
                         this.fetchBitcoinPrice();
                         this.saveState();
                     });
 
                     this.$watch('customPrice', value => {
+                        console.log('Custom price changed:', value);
                         if (!this.realtimePrice) this.bitcoinPrice = value;
                         this.saveState();
                     });
 
-                    this.$watch('taxRate1', () => this.saveState());
-                    this.$watch('taxRate2', () => this.saveState());
+                    this.$watch('taxRate1', value => {
+                        console.log('Tax rate 1 changed:', value);
+                        this.saveState();
+                    });
+
+                    this.$watch('taxRate2', value => {
+                        console.log('Tax rate 2 changed:', value);
+                        this.saveState();
+                    });
                 },
                 showError(message) {
+                    console.error('Error:', message);
                     this.errorMessage = message;
                 },
                 closeError() {
+                    console.log('Closing error message');
                     this.errorMessage = '';
                 }
             }
