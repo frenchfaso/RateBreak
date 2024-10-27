@@ -65,7 +65,7 @@
                 <div class="price-row">
                     <p>Current Bitcoin Price:</p>
                     <p class="price-value bitcoin-price-color">
-                        <span x-text="currencySymbol"></span> <span x-text="Math.floor(bitcoinPrice)"></span>
+                        <span x-text="currencySymbol"></span> <span x-text="formatPrice(bitcoinPrice)"></span>
                     </p>
                 </div>
 
@@ -73,7 +73,7 @@
                 <div class="price-row">
                     <p>Break Even Price:</p>
                     <p class="price-value break-even-price-color">
-                        <span x-text="currencySymbol"></span> <span x-text="Math.floor(breakEvenPrice)"></span>
+                        <span x-text="currencySymbol"></span> <span x-text="formatPrice(breakEvenPrice)"></span>
                     </p>
                 </div>
             </section>
@@ -298,6 +298,11 @@
                 closeError() {
                     console.log('Closing error message');
                     this.errorMessage = '';
+                },
+
+                // Method to format prices
+                formatPrice(value) {
+                    return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 }
             }
         }
