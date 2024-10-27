@@ -63,7 +63,7 @@
             <section>
                 <!-- Current Bitcoin Price -->
                 <div class="price-row">
-                    <p>Current Bitcoin Price:</p>
+                    <p>Bitcoin Price:</p>
                     <p class="price-value bitcoin-price-color">
                         <span x-text="currencySymbol"></span> <span x-text="formatPrice(bitcoinPrice)"></span>
                     </p>
@@ -91,7 +91,7 @@
                         <!-- Custom Price Input -->
                         <div x-show="!realtimePrice">
                             <label for="customPrice">Custom Price</label>
-                            <input type="number" id="customPrice" x-model="customPrice" min="0" @input="saveState()">
+                            <input type="number" id="customPrice" x-model.number="customPrice" min="0" @input="saveState()">
                         </div>
                     </fieldset>
 
